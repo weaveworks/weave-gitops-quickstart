@@ -1,0 +1,86 @@
+apiVersion: templates.weave.works/v1alpha2
+kind: GitOpsTemplate
+metadata:
+  name: pipeline-view
+  namespace: {{.Values.pipelines.namespace}}
+  annotations:
+    templates.weave.works/profiles-enabled: "false"
+    templates.weave.works/kustomizations-enabled: "false"
+    templates.weave.works/credentials-enabled: "false"
+  labels:
+    weave.works/template-type: pipeline
+spec:
+  description: sample pipeline to visualize a helm release application delivered to dev, test and prod environments
+  params:
+    # Pipeline parameters
+    - name: RESOURCE_NAME # Required parameter name for a valid template
+      description: Name of the Pipeline
+      required: true
+    - name: RESOURCE_NAMESPACE
+      description: Namespace for the Pipeline on the management cluster
+      required: true
+    # Application parameters - this template assumes consistent HelmRelease name and namespace across clusters
+    - name: APP_NAME
+      description: Name of the HelmRelease for your application
+      required: true
+    - name: APP_NAMESPACE
+      description: Namespace for the HelmRelease
+      required: true
+    # Deployment target parameters - this template is based on 3 environments each with a single cluster as a deployment target
+    - name: DEV_CLUSTER_NAME
+      description: Name of GitopsCluster object for Dev environment
+      default: "dev"
+    - name: DEV_CLUSTER_NAMESPACE
+      description: Namespace of GitopsCluster object for Dev environment
+      required: true
+      default: "clusters"
+    - name: TEST_CLUSTER_NAME
+      description: Name of GitopsCluster object for Test environment
+      default: "test"
+      required: true
+    - name: TEST_CLUSTER_NAMESPACE
+      description: Namespace of GitopsCluster object for Test environment
+      default: "clusters"
+      required: true
+    - name: PROD_CLUSTER_NAME
+      description: Name of GitopsCluster object for Prod environment
+      default: "prod"
+      required: true
+    - name: PROD_CLUSTER_NAMESPACE
+      description: Namespace of GitopsCluster object for Prod environment
+      default: "clusters"
+      required: true
+  resourcetemplates:
+    - content:
+      - apiVersion: pipelines.weave.works/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: ${RESOURCE_NAME}
+          namespace: ${RESOURCE_NAMESPACE}
+        spec:
+          appRef:
+            apiVersion: helm.toolkit.fluxcd.io/v2beta1
+            kind: HelmRelease
+            name: ${APP_NAME}
+          environments:
+          - name: dev
+            targets:
+              - namespace: ${APP_NAMESPACE}
+                clusterRef:
+                  kind: GitopsCluster
+                  name: ${DEV_CLUSTER_NAME}
+                  namespace: ${DEV_CLUSTER_NAMESPACE}
+          - name: test
+            targets:
+              - namespace: ${APP_NAMESPACE}
+                clusterRef:
+                  kind: GitopsCluster
+                  name: ${TEST_CLUSTER_NAME}
+                  namespace: ${TEST_CLUSTER_NAMESPACE}
+          - name: prod
+            targets:
+              - namespace: ${APP_NAMESPACE}
+                clusterRef:
+                  kind: GitopsCluster
+                  name: ${PROD_CLUSTER_NAME}
+                  namespace: ${PROD_CLUSTER_NAMESPACE}

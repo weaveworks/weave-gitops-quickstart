@@ -1,0 +1,62 @@
+apiVersion: templates.weave.works/v1alpha2
+kind: GitOpsTemplate
+metadata:
+  name: pipeline-promotion-resources
+  namespace: {{.Values.pipelines.namespace}}
+  annotations:
+    templates.weave.works/profiles-enabled: "false"
+    templates.weave.works/kustomizations-enabled: "false"
+    templates.weave.works/credentials-enabled: "false"
+  labels:
+    weave.works/template-type: pipeline
+spec:
+  description: create flux notification controller resources required for promoting applications via pipelines.
+  params:
+    # Pipeline parameters
+    - name: PIPELINE_NAME # Required parameter name for a valid template
+      description: Name of pipeline the resources form part of.
+      required: true
+    # Cluster parameters
+    - name: CLUSTER_NAME
+      description: Name of the cluster to create the resources to
+      required: true
+    # Application parameters
+    - name: RESOURCE_NAME # Required parameter name for a valid template
+      description: Name of the helm release application to promote. It will be used to reference the generated resources.
+      required: true
+    - name: NAMESPACE # Required parameter name for a valid template
+      description: Name of the helm release namespace to promote.
+      required: true
+    # Promotion parameters
+    - name: PROMOTION_BASE_URL # Required parameter name for a valid template
+      description: Base URL for the promotion webhook on the management cluster
+      required: true
+    - name: ENV_NAME
+      description: Environment the cluster is a part of within a pipeline.
+      required: true
+  resourcetemplates:
+    - content:
+      - apiVersion: notification.toolkit.fluxcd.io/v1beta1
+        kind: Provider
+        metadata:
+          name: ${RESOURCE_NAME}
+          namespace: ${NAMESPACE}
+        spec:
+          address: "${PROMOTION_BASE_URL}/promotion/${PIPELINE_NAME}/${RESOURCE_NAME}/${ENV_NAME}"
+          type: generic
+      - apiVersion: notification.toolkit.fluxcd.io/v1beta1
+        kind: Alert
+        metadata:
+          name: ${RESOURCE_NAME}
+          namespace: ${NAMESPACE}
+        spec:
+          providerRef:
+            name: ${RESOURCE_NAME}
+          eventSeverity: info
+          eventSources:
+            - kind: HelmRelease
+              name: ${RESOURCE_NAME}
+          exclusionList:
+            - ".*upgrade.*has.*started"
+            - ".*is.*not.*ready"
+            - "^Dependencies.*"
