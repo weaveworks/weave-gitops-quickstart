@@ -1,5 +1,5 @@
 apiVersion: v2
-name: getting-started-templates
-description: A set of gitops templates for getting started. Bundled with weave gitops enterprise for providing an initial baseline experience.
+name: weave-gitops-quickstart
+description: A set of resources to get started with weave gitops.
 type: application
 version: 0.1.0
