@@ -1,12 +1,12 @@
-# Weave Gitops Quickstart
-It contains quickstart resources to get you started with [weave gitops enterprise](https://docs.gitops.weave.works/):
+# Weave GitOps Quickstart
+It contains quickstart resources to get you started with [Weave GitOps Enterprise](https://docs.gitops.weave.works/):
 
-- [Quickstart Templates](./quickstart-templates): a set of [weave gitops templates]((https://docs.gitops.weave.works/docs/gitops-templates/templates/))
-  to get started using weave gitops enterprise.
+- [Quickstart Templates](./quickstart-templates): a set of [Weave GitOps templates](https://docs.gitops.weave.works/docs/gitops-templates/templates/)
+  to get started using Weave GitOps Enterprise.
 
 ## Requirements
 
-- You have [weave gitops enterprise](https://www.weave.works/product/gitops-enterprise/)
+- You have [Weave GitOps Enterprise](https://www.weave.works/product/gitops-enterprise/) installed on a cluster.
 
 ## Getting Started
 
