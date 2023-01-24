@@ -1,0 +1,97 @@
+apiVersion: templates.weave.works/v1alpha2
+kind: GitOpsTemplate
+metadata:
+  name: pipeline-view-promote-by-namespace
+  namespace: {{.Values.pipelines.namespace}}
+  annotations:
+    templates.weave.works/profiles-enabled: "false"
+    templates.weave.works/kustomizations-enabled: "false"
+    templates.weave.works/credentials-enabled: "false"
+  labels:
+    weave.works/template-type: pipeline
+spec:
+  description: create a pipeline for soft tenancy when applications are isolated by namespace
+  params:
+    # Pipeline parameters
+    - name: RESOURCE_NAME
+      description: Name of the Pipeline.
+      required: true
+    - name: RESOURCE_NAMESPACE
+      description: Namespace of the Pipeline on the management cluster.
+      required: true
+    # Application parameters
+    - name: APP_NAME
+      description: Name of the HelmRelease for your application
+      required: true
+    - name: APP_REPO_URL
+      description: URL for source of HelmRelease in Git
+      required: true
+    - name: APP_REPO_TYPE
+      description: Git repo type
+      options: [ "github","gitlab" ]
+    - name: APP_REPO_BRANCH
+      description: Branch to write updates to in Git
+      default: "main"
+    - name: GIT_CREDENTIALS_SECRET
+      description: Name of the secret in RESOURCE_NAMESPACE containing credentials to create pull requests
+      required: true
+    - name: DEV_NAMESPACE
+      description: Namespace running the development instance of the application.
+      required: true
+    - name: TEST_NAMESPACE
+      description: Namespace running the test instance of the application.
+      required: true
+    - name: PROD_NAMESPACE
+      description: Namespace running the production instance of the application.
+      required: true
+    # Cluster parameters
+    - name: CLUSTER_NAME
+      description: Name of cluster running the application in separate namespaces.
+      required: true
+    - name: CLUSTER_NAMESPACE
+      description: Namespace of cluster running the application in separate namespaces.
+      required: true
+  resourcetemplates:
+    - content:
+      - apiVersion: pipelines.weave.works/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: ${RESOURCE_NAME}
+          namespace: ${RESOURCE_NAMESPACE}
+        spec:
+          appRef:
+            apiVersion: helm.toolkit.fluxcd.io/v2beta1
+            kind: HelmRelease
+            name: ${APP_NAME}
+          environments:
+            # This template example enforces which namespaces of a single cluster an application team deploys to
+            # (soft tenancy). A similar template would support teams using isolation by cluster as a tenancy model.
+            - name: dev
+              targets:
+                - namespace: ${DEV_NAMESPACE}
+                  clusterRef:
+                    kind: GitopsCluster
+                    name: ${CLUSTER_NAME}
+                    namespace: ${CLUSTER_NAMESPACE}
+            - name: test
+              targets:
+                - namespace: ${TEST_NAMESPACE}
+                  clusterRef:
+                    kind: GitopsCluster
+                    name: ${CLUSTER_NAME}
+                    namespace: ${CLUSTER_NAMESPACE}
+            - name: prod
+              targets:
+                - namespace: ${PROD_NAMESPACE}
+                  clusterRef:
+                    kind: GitopsCluster
+                    name:  ${CLUSTER_NAME}
+                    namespace: ${CLUSTER_NAMESPACE}
+          promotion:
+            strategy:
+              pull-request:
+                url: ${APP_REPO_URL}
+                branch: ${APP_REPO_BRANCH}
+                type: ${APP_REPO_TYPE}
+                secretRef:
+                  name: ${GIT_CREDENTIALS_SECRET}

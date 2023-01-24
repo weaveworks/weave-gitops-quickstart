@@ -1,0 +1,68 @@
+apiVersion: templates.weave.works/v1alpha2
+kind: GitOpsTemplate
+metadata:
+  name: pipeline-promotion-resources
+  namespace: {{.Values.pipelines.namespace}}
+  annotations:
+    templates.weave.works/profiles-enabled: "false"
+    templates.weave.works/kustomizations-enabled: "false"
+    templates.weave.works/credentials-enabled: "false"
+  labels:
+    weave.works/template-type: pipeline
+spec:
+  description: create flux notification controller resources required for promoting applications via pipelines.
+  params:
+    # Notification resource parameters
+    - name: RESOURCE_NAME
+      description: Name of the notification controller resources (Provider/Alert) to create.
+      required: true
+    - name: RESOURCE_NAMESPACE
+      description: Namespace of the notification controller resources (Provider/Alert) to create.
+      required: true
+    # Promotion parameters
+    - name: PROMOTION_BASE_URL
+      description: Base URL for the promotion webhook on the management cluster.
+      required: true
+    - name: PIPELINE_NAME
+      description: Name of pipeline to reference for promotion notification. Used to construct the promotion webhook URL.
+      required: true
+    - name: PIPELINE_NAMESPACE
+      description: Namespace of pipeline to reference for promotion notification. Used to construct the promotion webhook URL.
+      required: true
+    - name: ENV_NAME
+      description: Environment defined in pipeline that has been a target of a promotion. Used to construct the promotion webhook URL.
+      required: true
+    # Application parameters
+    - name: HELM_RELEASE_NAME
+      description: Name of Helm release to monitor for promotions.
+      required: true
+    - name: HELM_RELEASE_NAMESPACE
+      description: Namespace of Helm release to monitor for promotions.
+      required: true
+  resourcetemplates:
+    - content:
+      - apiVersion: notification.toolkit.fluxcd.io/v1beta1
+        kind: Provider
+        metadata:
+          name: ${RESOURCE_NAME}
+          namespace: ${RESOURCE_NAMESPACE}
+        spec:
+          address: "${PROMOTION_BASE_URL}/promotion/${PIPELINE_NAMESPACE}/${PIPELINE_NAME}/${ENV_NAME}"
+          type: generic
+      - apiVersion: notification.toolkit.fluxcd.io/v1beta1
+        kind: Alert
+        metadata:
+          name: ${RESOURCE_NAME}
+          namespace: ${RESOURCE_NAMESPACE}
+        spec:
+          providerRef:
+            name: ${RESOURCE_NAME}
+          eventSeverity: info
+          eventSources:
+            - kind: HelmRelease
+              name: ${HELM_RELEASE_NAME}
+              namespace: ${HELM_RELEASE_NAMESPACE}
+          exclusionList:
+            - ".*upgrade.*has.*started"
+            - ".*is.*not.*ready"
+            - "^Dependencies.*"
