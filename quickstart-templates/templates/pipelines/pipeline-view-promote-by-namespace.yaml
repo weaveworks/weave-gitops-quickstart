@@ -13,19 +13,19 @@ spec:
   description: create a pipeline for soft tenancy when applications are isolated by namespace
   params:
     # Pipeline parameters
-    - name: RESOURCE_NAME # Required parameter name for a valid template
-      description: Name of the Pipeline
+    - name: RESOURCE_NAME
+      description: Name of the Pipeline.
       required: true
     - name: RESOURCE_NAMESPACE
-      description: Namespace for the Pipeline on the management cluster
+      description: Namespace of the Pipeline on the management cluster.
       required: true
-    # Application parameters - this template assumes consistent HelmRelease name and namespace across clusters
+    # Application parameters
     - name: APP_NAME
       description: Name of the HelmRelease for your application
-    - name: APP_NAMESPACE
-      description: Namespace for the HelmRelease
+      required: true
     - name: APP_REPO_URL
       description: URL for source of HelmRelease in Git
+      required: true
     - name: APP_REPO_TYPE
       description: Git repo type
       options: [ "github","gitlab" ]
@@ -34,6 +34,23 @@ spec:
       default: "main"
     - name: GIT_CREDENTIALS_SECRET
       description: Name of the secret in RESOURCE_NAMESPACE containing credentials to create pull requests
+      required: true
+    - name: DEV_NAMESPACE
+      description: Namespace running the development instance of the application.
+      required: true
+    - name: TEST_NAMESPACE
+      description: Namespace running the test instance of the application.
+      required: true
+    - name: PROD_NAMESPACE
+      description: Namespace running the production instance of the application.
+      required: true
+    # Cluster parameters
+    - name: CLUSTER_NAME
+      description: Name of cluster running the application in separate namespaces.
+      required: true
+    - name: CLUSTER_NAMESPACE
+      description: Namespace of cluster running the application in separate namespaces.
+      required: true
   resourcetemplates:
     - content:
       - apiVersion: pipelines.weave.works/v1alpha1
@@ -47,30 +64,29 @@ spec:
             kind: HelmRelease
             name: ${APP_NAME}
           environments:
-            # This template example enforces which clusters an application team deploys to, but allows
-            # the association of an app by HelmRelease name and namespace. A similar template would
-            # support teams using isolation by namespace as a tenancy model.
+            # This template example enforces which namespaces of a single cluster an application team deploys to
+            # (soft tenancy). A similar template would support teams using isolation by cluster as a tenancy model.
             - name: dev
               targets:
-                - namespace: ${APP_NAMESPACE}
+                - namespace: ${DEV_NAMESPACE}
                   clusterRef:
                     kind: GitopsCluster
-                    name: dev
-                    namespace: flux-system
+                    name: ${CLUSTER_NAME}
+                    namespace: ${CLUSTER_NAMESPACE}
             - name: test
               targets:
-                - namespace: ${APP_NAMESPACE}
+                - namespace: ${TEST_NAMESPACE}
                   clusterRef:
                     kind: GitopsCluster
-                    name: test
-                    namespace: flux-system
+                    name: ${CLUSTER_NAME}
+                    namespace: ${CLUSTER_NAMESPACE}
             - name: prod
               targets:
-                - namespace: ${APP_NAMESPACE}
+                - namespace: ${PROD_NAMESPACE}
                   clusterRef:
                     kind: GitopsCluster
-                    name: prod
-                    namespace: flux-system
+                    name:  ${CLUSTER_NAME}
+                    namespace: ${CLUSTER_NAMESPACE}
           promotion:
             strategy:
               pull-request:
