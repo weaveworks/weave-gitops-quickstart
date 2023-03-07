@@ -91,7 +91,7 @@ spec:
             strategy:
               pull-request:
                 url: ${APP_REPO_URL}
-                branch: ${APP_REPO_BRANCH}
+                baseBranch: ${APP_REPO_BRANCH}
                 type: ${APP_REPO_TYPE}
                 secretRef:
                   name: ${GIT_CREDENTIALS_SECRET}
