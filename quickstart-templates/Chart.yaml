@@ -2,4 +2,4 @@ apiVersion: v2
 name: weave-gitops-quickstart
 description: A set of resources to get started with weave gitops.
 type: application
-version: 0.1.0
+version: 0.1.1
