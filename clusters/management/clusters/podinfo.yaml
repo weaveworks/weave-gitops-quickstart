@@ -1,0 +1,41 @@
+apiVersion: templates.weave.works/v1alpha1
+kind: GitOpsSet
+metadata:
+  annotations:
+    metadata.weave.works/description: This GitOps Set shows off a basic list generator.  This is really useful for adding data to a Kubernetes resource and then the generator will create N-resources based on the length of the list of data.  This is really useful for customizing simple values where you have 100 lines of YAML, but only one or two pieces of data are actually unique.
+    templates.weave.works/create-request: "{\"repository_url\":\"https://github.com/weaveworks/weave-gitops-quickstart\",\"head_branch\":\"wge-create-branch-tqs5qs\",\"base_branch\":\"main\",\"title\":\"Create resource podinfo\",\"description\":\"This PR creates a create-a-gitopssets-application instance\",\"template_name\":\"create-a-gitopssets-application\",\"parameter_values\":{\"RESOURCE_NAME\":\"podinfo\"},\"commit_message\":\"Create create-a-gitopssets-application instance\",\"credentials\":{},\"template_namespace\":\"steve-test\",\"template_kind\":\"GitOpsTemplate\"}"
+    templates.weave.works/created-files: "{\"files\":[\"clusters/management/clusters/podinfo.yaml\"]}"
+  labels:
+    templates.weave.works/template-name: create-a-gitopssets-application
+    templates.weave.works/template-namespace: default
+  name: environments-podinfo
+  namespace: flux-system
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: dev
+        path: ./kustomize
+        version: x.x.x
+      - cluster: prod
+        path: /kustomize
+        version: x.x.x
+  templates:
+  - content:
+      apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+      kind: Kustomization
+      metadata:
+        labels:
+          app.kubernetes.io/instance: '{{ .Element.cluster }}'
+          app.kubernetes.io/name: podinfo
+        name: podinfo-{{ .Element.cluster }}
+      spec:
+        interval: 5m
+        kubeConfig:
+          secretRef:
+            name: '{{ .Element.cluster }}-kubeconfig'
+        path: '{{ .Element.path }}'
+        prune: true
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
