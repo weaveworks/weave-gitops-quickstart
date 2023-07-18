@@ -20,7 +20,7 @@ spec:
     strategy:
       pull-request:
         type: github
-        url: https://github.com/weaveworks/weave-gitops-clusters
+        url: https://github.com/example/clusters
         baseBranch: main
         secretRef:
           name: promotion-credentials
