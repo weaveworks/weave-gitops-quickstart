@@ -34,7 +34,7 @@ spec:
 ```
 
 Once the application has been reconciled, try to run the test cases within [tests](./tests) to 
-create a set of kubernetes resources that would try to read the pipeline secret by different escalations.
+create a set of Kubernetes resources that would try to read the pipeline secret by different escalations.
 
 ```bash 
 kubectl apply -f tests --recursive
