@@ -1,0 +1,26 @@
+apiVersion: pipelines.weave.works/v1alpha1
+kind: Pipeline
+metadata:
+  name: podinfo
+  namespace: podinfo
+spec:
+  appRef:
+    apiVersion: helm.toolkit.fluxcd.io/v2beta1
+    kind: HelmRelease
+    name: podinfo
+  environments:
+    - name: dev
+      targets:
+        - namespace: dev
+    - name: prod
+      targets:
+        - namespace: prod
+  promotion:
+    manual: true
+    strategy:
+      pull-request:
+        type: github
+        url: https://github.com/example/clusters
+        baseBranch: main
+        secretRef:
+          name: promotion-credentials
