@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/part-of: flux
     kustomize.toolkit.fluxcd.io/name: monitoring-config
     kustomize.toolkit.fluxcd.io/namespace: flux-system
-  name: weave-gitops-enterprise
+  name: weave-gitops
   namespace: monitoring
 spec:
   namespaceSelector:
@@ -16,7 +16,7 @@ spec:
     - port: http-metrics
   selector:
     matchExpressions:
-      - key: app.kubernetes.io/instance
+      - key: app.kubernetes.io/part-of
         operator: In
         values:
-          - weave-gitops-enterprise
+          - weave-gitops
