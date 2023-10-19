@@ -13,7 +13,6 @@ spec:
   podMetricsEndpoints:
     - port: http-metrics
     - port: monitoring
-
   selector:
     matchExpressions:
       - key: app.kubernetes.io/part-of
