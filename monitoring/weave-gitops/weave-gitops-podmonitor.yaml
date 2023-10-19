@@ -13,6 +13,7 @@ spec:
   podMetricsEndpoints:
     - port: http-metrics
     - port: monitoring
+    - port: metrics
 
   selector:
     matchExpressions:
