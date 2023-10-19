@@ -14,7 +14,7 @@ spec:
     - port: http-metrics
     - port: monitoring
     - port: metrics
-
+    - port: http-prom
   selector:
     matchExpressions:
       - key: app.kubernetes.io/part-of
