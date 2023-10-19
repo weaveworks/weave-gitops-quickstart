@@ -21,3 +21,10 @@ spec:
         operator: In
         values:
           - weave-gitops
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - tf-controller
+          - gitopssets-controller
+          - cluster-controller
+          - mccp
