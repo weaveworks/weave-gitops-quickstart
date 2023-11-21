@@ -40,7 +40,7 @@ create a set of Kubernetes resources that would try to read the pipeline secret 
 kubectl apply -f tests --recursive
 ```
 
-You should see that the resources have been blocked. Weave Gitops UI cluster violations would look similar to: 
+You should see that the resources have been blocked. Weave GitOps UI cluster violations would look similar to: 
 
 ![pipeline-security-violations.png](imgs%2Fpipeline-security-violations.png)
 
