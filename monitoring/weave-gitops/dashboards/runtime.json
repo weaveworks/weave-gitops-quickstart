@@ -21,7 +21,7 @@
       }
     ]
   },
-  "description": "Weave Gitops Go Runtime metrics",
+  "description": "Weave GitOps Go Runtime metrics",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": 10826,
@@ -1051,7 +1051,7 @@
     ]
   },
   "timezone": "",
-  "title": "Weave Gitops - Runtime",
+  "title": "Weave GitOps - Runtime",
   "uid": "weave-gitops-runtime",
   "version": 1,
   "weekStart": ""

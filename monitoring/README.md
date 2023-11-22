@@ -1,12 +1,12 @@
 # Monitoring
 
-The monitoring stack is deployed as [Flux Kustomization](https://github.com/weaveworks/weave-gitops-quickstart/tree/add-monitoring) that includes:
+The monitoring stack is composed of:
 
 - Prometheus
 - Grafana
 - Kubernetes Dashboards
 - Flux Dashboards
-- Weave Gitops Grafana dashboards
+- Weave GitOps Grafana dashboards
 
 ## Requirements
 

@@ -21,7 +21,7 @@
       }
     ]
   },
-  "description": "weave gitops explorer metrics",
+  "description": "Weave GitOps explorer metrics",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -1384,7 +1384,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Weave Gitops - Explorer",
+  "title": "Weave GitOps - Explorer",
   "uid": "weave-gitops-explorer",
   "version": 2,
   "weekStart": ""
