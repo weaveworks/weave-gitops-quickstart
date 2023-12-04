@@ -802,7 +802,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "collector_cluster_watcher{collector=\"roles\"}",
+          "expr": "collector_cluster_watcher{collector=\"rbac\"}",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
